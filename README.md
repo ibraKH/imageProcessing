@@ -14,11 +14,11 @@ Resize and filtering image using :
 
 To start the project and try the project , write in git bash :
 
-1- git clone https://github.com/ibraKH/imageProcessing.git
-2- cd imageProcessing
-3- npm install
-4- npm start
-5- Open the browser and run at localhost port 3004
+1- git clone https://github.com/ibraKH/imageProcessing.git <br>
+2- cd imageProcessing <br>
+3- npm install <br>
+4- npm start <br>
+5- Open the browser and run at localhost port 3004 <br>
 
 That's it 
 

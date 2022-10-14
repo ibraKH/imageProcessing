@@ -12,7 +12,7 @@ describe('Test Home page response', () => {
 });
 
 describe('Test for unfound page response', () => {
-    it('gets error statu', async () => {
+    it('gets error status', async () => {
         // entering random page
         const res = await request.get("/re");
 

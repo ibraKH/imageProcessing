@@ -69,7 +69,7 @@ router.get("/img/?name=:name&width=:width&height=:height", (req, res) => {
     // if the name of the image does not exist send 404 Or same name but different sizes than that stored
     if (!(fs_1.default.existsSync(`./build/images/${image.name}_${image.width}x${image.height}.jpg`))) {
         const parentPath = path_1.default.resolve(__dirname, "..");
-        return res.sendFile(parentPath + "/public/image.html");
+        return res.status(404).sendFile(parentPath + "/public/image.html");
     }
     const img = fs_1.default.readFileSync(`./build/images/${image.name}_${image.width}x${image.height}.jpg`);
     res.writeHead(200, { 'Content-Type': 'image/gif' });

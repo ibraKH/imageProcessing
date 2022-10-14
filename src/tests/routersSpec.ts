@@ -17,6 +17,7 @@ describe('Post Resize page', () => {
     });
 });
 
+// Post Resize without image file
 describe('Testing for empty image', () => {
     it('gets error status', async () => {
         const res = await request.post("/resize").send({ width: '500', height: '500'});
@@ -25,12 +26,31 @@ describe('Testing for empty image', () => {
     });
 });
 
+// Post Resize with negative numbers
 describe('Testing for negative numbers', () => {
     it('gets error status', async () => {
         const res = await request.post("/resize").set('content-type', 'multipart/form-data')
         .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
         .field('width', '-400')
         .field('height', "400")
+
+        expect(res.statusCode).toEqual(404);
+    });
+});
+
+// Get img with required params
+describe('Testing for displaying img', () => {
+    it('gets error status', async () => {
+        const res = await request.get("/img/name=test&width=500&height=700")
+
+        expect(res.statusCode).toEqual(200);
+    });
+});
+
+// Get img with new name : expect error
+describe('Testing for displaying img', () => {
+    it('gets error status', async () => {
+        const res = await request.get("/img/name=Riyadh&width=500&height=700")
 
         expect(res.statusCode).toEqual(404);
     });

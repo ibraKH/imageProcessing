@@ -22,7 +22,7 @@ describe('Test Home page response', () => {
     }));
 });
 describe('Test for unfound page response', () => {
-    it('gets error statu', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
         // entering random page
         const res = yield request.get("/re");
         expect(res.statusCode).toEqual(404);

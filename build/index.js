@@ -12,8 +12,6 @@ const app = (0, express_1.default)();
 app.use((0, express_fileupload_1.default)());
 // to use static file , image , html pages
 app.use(express_1.default.static('./build/public'));
-// use json 
-app.use(express_1.default.json());
 app.use("/", routers_1.default);
 const port = 3004;
 // Home Page

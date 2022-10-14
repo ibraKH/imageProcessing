@@ -13,9 +13,6 @@ app.use(fileUpload());
 // to use static file , image , html pages
 app.use(express.static('./build/public'));
 
-// use json 
-app.use(express.json());
-
 app.use("/", routers);
 
 const port = 3004;

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style/style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="main">
+      <div id="details">
+        <h1 id="title">Image Processing Udacity Project</h1>
+        <h4>Resize and Filter any image</h4>
+        <h5>Made by <i>ibrahim</i></h5>
+      </div>
+      <img src="./images/leftTop.svg" alt="Blob" id="leftTop" />
+      <img src="./images/leftBottom.svg" alt="Blob" id="leftBottom" />
+      <img src="./images/rightTop.svg" alt="Blob" id="rightTop" />
+      <img src="./images/rightBottom.svg" alt="Blob" id="rightBottom" />
+      <div id="parent">
+        <form action="/resize" method="post" enctype="multipart/form-data">
+          <div id="imageInput">
+            <label for="image" class="imageLabel"
+              ><img
+                src="./images/capslock-fill.svg"
+                alt="upload"
+                class="upload"
+              />Select Image</label
+            ><br />
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              required
+              id="image"
+            />
+          </div>
+          <div id="sizeInput">
+            <label for="width" class="widthLabel">Width</label>
+            <label for="height">Height</label>
+            <br />
+            <input
+              type="number"
+              name="width"
+              required
+              id="width"
+              class="sizeInputs"
+            />
+            <input
+              type="number"
+              name="height"
+              required
+              id="height"
+              class="sizeInputs"
+            />
+          </div>
+          <div id="filters">
+            <div>
+              <label for="flip">Flip</label>
+              <input type="checkbox" name="flip" id="flip" />
+            </div>
+            <div>
+              <label for="gray">Gray Filter</label>
+              <input type="checkbox" name="gray" id="gray" />
+            </div>
+            <div>
+              <label for="blur">Blur</label>
+              <input type="checkbox" name="blur" id="blur" />
+            </div>
+          </div>
+          <button type="submit" class="submit" id="submit">Upload</button>
+        </form>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: 'Quicksand', sans-serif;
+  overflow: hidden;
+}
+#sizeInput {
+  margin: 20px;
+}
+#image {
+  display: none;
+}
+.imageLabel {
+  border: 1px solid #6b3dd8;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 20px;
+}
+.widthLabel {
+  margin-right: 95px;
+}
+.sizeInputs {
+  border: 1px #ff3970 solid;
+  border-radius: 20px;
+}
+#filters {
+  margin-bottom: 20px;
+}
+.submit {
+  border: none;
+  width: 100px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #2bd1de;
+  color: white;
+}
+.upload {
+  margin-right: 5px;
+}
+#leftTop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 25%;
+}
+#leftBottom {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 25%;
+}
+#rightTop {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 25%;
+}
+#rightBottom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 25%;
+}
+#details {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 2;
+}
+i {
+  font-style: normal;
+  color: #ff3970;
+}
+input {
+  font-family: 'Quicksand', sans-serif;
+}
+button {
+  font-family: 'Quicksand', sans-serif;
+}

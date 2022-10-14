@@ -1,0 +1,25 @@
+body {
+  background-color: rgba(255, 0, 0, 0.116);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  font-family: 'Quicksand', sans-serif;
+}
+a {
+  text-decoration: none;
+  color: black;
+}
+button {
+  width: 100px;
+  height: 20px;
+  background-color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+img {
+  height: 200px;
+  width: 200px;
+}

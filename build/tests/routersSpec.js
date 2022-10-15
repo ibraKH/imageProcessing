@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
-const fs_1 = __importDefault(require("fs"));
 const index_1 = __importDefault(require("../index"));
 const resize_1 = __importDefault(require("../resize"));
 const request = (0, supertest_1.default)(index_1.default);
@@ -41,27 +40,6 @@ describe('Resize page with get method', () => {
 describe('Get Resize page with get method', () => {
     it('gets errot status', () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield request.get('/resize/img/name=test&width=500&height=-500');
-        expect(res.statusCode).toEqual(404);
-    }));
-});
-// Post Resize without image file
-describe('Testing for empty image', () => {
-    it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request
-            .post('/resize')
-            .send({ width: '500', height: '500' });
-        expect(res.statusCode).toEqual(404);
-    }));
-});
-// Post Resize with negative numbers
-describe('Testing for negative numbers', () => {
-    it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request
-            .post('/resize')
-            .set('content-type', 'multipart/form-data')
-            .attach('image', fs_1.default.readFileSync(`upload/test.jpeg`))
-            .field('width', '-400')
-            .field('height', '400');
         expect(res.statusCode).toEqual(404);
     }));
 });

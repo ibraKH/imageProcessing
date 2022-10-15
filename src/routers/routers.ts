@@ -6,66 +6,6 @@ import resize from '../resize';
 
 const router = express.Router();
 
-// get method to resize and filtter image , Request body shoud contain image file , width , height
-// Here if you want to store new image , if you have existed image try localhost:3004/resize/img/name=name&width=width&heigth=height
-router.post(
-  '/resize',
-  async (req: Request, res: Response): Promise<unknown> => {
-    // send 404 when image file is empty
-    if (!req.files) {
-      return res.status(404).send('Please enter an image');
-    }
-
-    // expected eslint warning here since its any , cannot change it to unknown beacuse it will show error
-    const { image }: any = req.files;
-
-    // convert from string to number since the req.body gets as string
-    const width = parseInt(req.body.width);
-    const height = parseInt(req.body.height);
-
-    // send 404 when having negative numbers
-    if (width < 0 || height < 0) {
-      return res.status(404).send('Please enter a postive number');
-    }
-
-    let blur = false;
-    let gray = false;
-    let flip = false;
-
-    if (req.body.blur == 'on') {
-      blur = true;
-    }
-    if (req.body.flip == 'on') {
-      flip = true;
-    }
-    if (req.body.gray == 'on') {
-      gray = true;
-    }
-
-    // create new file only if it does not exist already in the upload folder
-    if (!fs.existsSync(`./upload/${image.name}`)) {
-      await image.mv('./upload/' + image.name);
-    }
-
-    // calling resize function that resize the image
-    const imageName = image.name.split('.')[0];
-    const resizeImagePath = await resize(
-      imageName,
-      width,
-      height,
-      blur,
-      gray,
-      flip
-    );
-
-    // display the image
-    const parentPath = path.resolve(resizeImagePath);
-    const img = fs.readFileSync(parentPath);
-    res.writeHead(200, { 'Content-Type': 'image/gif' });
-    res.end(img);
-  }
-);
-
 // Resize without post method , with middleware to test if the file is exist
 router.get(
   '/resize/img/?name=:name&width=:width&height=:height',

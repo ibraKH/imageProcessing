@@ -75,6 +75,10 @@ body {
   text-align: center;
   z-index: 2;
 }
+.hide{
+  display: none;
+  opacity: 0;
+}
 i {
   font-style: normal;
   color: #ff3970;

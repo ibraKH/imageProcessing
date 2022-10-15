@@ -25,8 +25,7 @@
       <img src="./images/rightTop.svg" alt="Blob" id="rightTop" />
       <img src="./images/rightBottom.svg" alt="Blob" id="rightBottom" />
       <div id="parent">
-        <form action="/resize" method="post" enctype="multipart/form-data">
-          <div id="imageInput">
+          <div id="imageInput" class="hide">
             <label for="image" class="imageLabel"
               ><img
                 src="./images/capslock-fill.svg"
@@ -64,19 +63,19 @@
           <div id="filters">
             <div>
               <label for="flip">Flip</label>
-              <input type="checkbox" name="flip" id="flip" />
+              <input type="checkbox" name="flip" id="flip" disabled />
             </div>
             <div>
               <label for="gray">Gray Filter</label>
-              <input type="checkbox" name="gray" id="gray" />
+              <input type="checkbox" name="gray" id="gray" disabled />
             </div>
             <div>
               <label for="blur">Blur</label>
-              <input type="checkbox" name="blur" id="blur" />
+              <input type="checkbox" name="blur" id="blur" disabled />
             </div>
           </div>
           <button type="submit" class="submit" id="submit">Upload</button>
-        </form>
+          <form action="" method="get" id="form"><button id="getSubmit" type="submit" class="hide"></button></form>
       </div>
     </div>
     <script src="script.js"></script>

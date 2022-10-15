@@ -1,21 +1,16 @@
 import supertest from 'supertest';
 import fs from 'fs';
 import app from '../index';
+import resize from '../resize';
 
 const request = supertest(app);
 
-// Post method : not required
-describe('Get Resize page with post method', () => {
-  it('gets a resized image', async () => {
-    const res = await request
-      .post('/resize')
-      .set('content-type', 'multipart/form-data')
-      .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
-      .field('width', '400')
-      .field('height', '400');
+// Test if resize return a path of resized image
+describe('Testing resize module', () => {
+  it('gets path to resized image', async () => {
+    const path = await resize('test', 400, 400);
 
-    // 302 since the api redirect to display the image
-    expect(res.statusCode).toEqual(302);
+    expect(path).toEqual('resized/test_400x400.jpg');
   });
 });
 
@@ -23,7 +18,6 @@ describe('Resize page with get method', () => {
   it('gets a resized image', async () => {
     const res = await request.get('/resize/img/name=test&width=500&height=500');
 
-    // 302 since the api redirect to display the image
     expect(res.statusCode).toEqual(200);
   });
 });
@@ -35,7 +29,6 @@ describe('Resize page with get method', () => {
       '/resize/img/name=test&width=500&height=-500'
     );
 
-    // 302 since the api redirect to display the image
     expect(res.statusCode).toEqual(404);
   });
 });
@@ -47,7 +40,6 @@ describe('Get Resize page with get method', () => {
       '/resize/img/name=test&width=500&height=-500'
     );
 
-    // 302 since the api redirect to display the image
     expect(res.statusCode).toEqual(404);
   });
 });
@@ -69,7 +61,7 @@ describe('Testing for negative numbers', () => {
     const res = await request
       .post('/resize')
       .set('content-type', 'multipart/form-data')
-      .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
+      .attach('image', fs.readFileSync(`upload/test.jpeg`))
       .field('width', '-400')
       .field('height', '400');
 

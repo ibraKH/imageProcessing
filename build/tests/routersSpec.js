@@ -15,32 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const fs_1 = __importDefault(require("fs"));
 const index_1 = __importDefault(require("../index"));
+const resize_1 = __importDefault(require("../resize"));
 const request = (0, supertest_1.default)(index_1.default);
-// Post method : not required
-describe('Get Resize page with post method', () => {
-    it('gets a resized image', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request
-            .post('/resize')
-            .set('content-type', 'multipart/form-data')
-            .attach('image', fs_1.default.readFileSync(`./build/upload/test.jpeg`))
-            .field('width', '400')
-            .field('height', '400');
-        // 302 since the api redirect to display the image
-        expect(res.statusCode).toEqual(302);
+// Test if resize return a path of resized image
+describe('Testing resize module', () => {
+    it('gets path to resized image', () => __awaiter(void 0, void 0, void 0, function* () {
+        const path = yield (0, resize_1.default)('test', 400, 400);
+        expect(path).toEqual('resized/test_400x400.jpg');
     }));
 });
 describe('Resize page with get method', () => {
     it('gets a resized image', () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield request.get('/resize/img/name=test&width=500&height=500');
-        // 302 since the api redirect to display the image
         expect(res.statusCode).toEqual(200);
     }));
 });
-// Resize with file name thats never stored 
+// Resize with file name thats never stored
 describe('Resize page with get method', () => {
     it('gets errot status', () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield request.get('/resize/img/name=test&width=500&height=-500');
-        // 302 since the api redirect to display the image
         expect(res.statusCode).toEqual(404);
     }));
 });
@@ -48,7 +41,6 @@ describe('Resize page with get method', () => {
 describe('Get Resize page with get method', () => {
     it('gets errot status', () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield request.get('/resize/img/name=test&width=500&height=-500');
-        // 302 since the api redirect to display the image
         expect(res.statusCode).toEqual(404);
     }));
 });
@@ -67,7 +59,7 @@ describe('Testing for negative numbers', () => {
         const res = yield request
             .post('/resize')
             .set('content-type', 'multipart/form-data')
-            .attach('image', fs_1.default.readFileSync(`./build/upload/test.jpeg`))
+            .attach('image', fs_1.default.readFileSync(`upload/test.jpeg`))
             .field('width', '-400')
             .field('height', '400');
         expect(res.statusCode).toEqual(404);

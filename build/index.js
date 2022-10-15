@@ -21,7 +21,9 @@ app.get('/', (req, res) => {
 });
 // Block unused pages
 app.get('*', (req, res) => {
-    res.status(404).sendFile(__dirname + '/public/notFound.html');
+    res
+        .status(404)
+        .send('Page not found, resize from /resize/img/name=name&width=width&height=height');
 });
 app.listen(port, () => console.log(`Listening on port : ${port}`));
 exports.default = app;

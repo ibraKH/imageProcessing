@@ -1,71 +1,70 @@
 import express, { Request, Response, NextFunction } from 'express';
-import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
+
+import resize from '../resize';
 
 const router = express.Router();
 
 // get method to resize and filtter image , Request body shoud contain image file , width , height
 // Here if you want to store new image , if you have existed image try localhost:3004/resize/img/name=name&width=width&heigth=height
-router.post('/resize', async (req: Request, res: Response): Promise<void> => {
-  // send 404 when image file is empty
-  if (!req.files) {
-    const parentPath = path.resolve(__dirname, '..');
-    return res.status(404).sendFile(parentPath + '/public/image.html');
-  }
+router.post(
+  '/resize',
+  async (req: Request, res: Response): Promise<unknown> => {
+    // send 404 when image file is empty
+    if (!req.files) {
+      return res.status(404).send('Please enter an image');
+    }
 
-  // expected eslint warning here since its any , cannot change it to unknown beacuse it will show error
-  const { image }: any = req.files;
+    // expected eslint warning here since its any , cannot change it to unknown beacuse it will show error
+    const { image }: any = req.files;
 
-  // convert from string to number since the req.body gets as string
-  const width = parseInt(req.body.width);
-  const height = parseInt(req.body.height);
+    // convert from string to number since the req.body gets as string
+    const width = parseInt(req.body.width);
+    const height = parseInt(req.body.height);
 
-  // send 404 when having negative numbers
-  if (width < 0 || height < 0) {
-    const parentPath = path.resolve(__dirname, '..');
-    return res.status(404).sendFile(parentPath + '/public/image.html');
-  }
+    // send 404 when having negative numbers
+    if (width < 0 || height < 0) {
+      return res.status(404).send('Please enter a postive number');
+    }
 
-  let blur = false;
-  let gray = false;
-  let flip = false;
+    let blur = false;
+    let gray = false;
+    let flip = false;
 
-  if (req.body.blur == 'on') {
-    blur = true;
-  }
-  if (req.body.flip == 'on') {
-    flip = true;
-  }
-  if (req.body.gray == 'on') {
-    gray = true;
-  }
+    if (req.body.blur == 'on') {
+      blur = true;
+    }
+    if (req.body.flip == 'on') {
+      flip = true;
+    }
+    if (req.body.gray == 'on') {
+      gray = true;
+    }
 
-  // create new file only if it does not exist already in the upload folder
-  if (!fs.existsSync(`./build/upload/${image.name}`)) {
-    await image.mv('./build/upload/' + image.name);
-  }
+    // create new file only if it does not exist already in the upload folder
+    if (!fs.existsSync(`./upload/${image.name}`)) {
+      await image.mv('./upload/' + image.name);
+    }
 
-  // using sharp to resize and filtering
-  await sharp(`./build/upload/${image.name}`)
-    .resize(width, height)
-    .grayscale(gray)
-    .flip(flip)
-    .blur(blur ? 2 : 0.3)
-    .toFile(
-      `./build/images/${image.name.split('.')[0]}_${width}x${height}.jpg`,
-      (err): void => {
-        if (err) console.log(err);
-
-        // redirect to display the image
-        return res.redirect(
-          `/img/name=${
-            image.name.split('.')[0]
-          }&width=${width}&height=${height}`
-        );
-      }
+    // calling resize function that resize the image
+    const imageName = image.name.split('.')[0];
+    const resizeImagePath = await resize(
+      imageName,
+      width,
+      height,
+      blur,
+      gray,
+      flip
     );
-});
+
+    // display the image
+    const parentPath = path.resolve(resizeImagePath);
+    const img = fs.readFileSync(parentPath);
+    res.writeHead(200, { 'Content-Type': 'image/gif' });
+    res.end(img);
+  }
+);
 
 // Resize without post method , with middleware to test if the file is exist
 router.get(
@@ -76,57 +75,62 @@ router.get(
     let match = false;
 
     // test if image name is stored
-    fs.readdir('./build/upload/', (err, files): void => {
+    fs.readdir('./upload/', (err, files): unknown => {
+      const filesNames: string[] = [];
       files.forEach((file): void => {
+        const fname = file.split('.')[0];
+        filesNames.push(fname);
         if (file.split('.')[0] == image) {
           match = true;
         }
       });
 
       if (!match) {
-        const parentPath = path.resolve(__dirname, '..');
-        return res.status(404).sendFile(parentPath + '/public/image.html');
+        return res
+          .status(404)
+          .send(
+            `Please enter the name of the file correctly , if the file you looking for does not exist use these one that already stored ${filesNames}`
+          );
       } else {
         next();
       }
     });
   },
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<unknown> => {
     const image: string = req.params.name;
 
     // convert from string to number since the req.params gets as string
     const width = parseInt(req.params.width);
     const height = parseInt(req.params.height);
 
-    // send 404 when having negative numbers
-    if (width < 0 || height < 0) {
-      const parentPath = path.resolve(__dirname, '..');
-      return res.status(404).sendFile(parentPath + '/public/image.html');
+    // send 404 when having negative numbers or characters
+    if (
+      width < 0 ||
+      height < 0 ||
+      req.params.width.match('[a-zA-Z]+') ||
+      req.params.height.match('[a-zA-Z]+')
+    ) {
+      return res
+        .status(404)
+        .send('Please enter only postive numbers in width , height');
     }
 
-    // using sharp to resize and filtering
-    await sharp(`./build/upload/${image}.jpeg`)
-      .resize(width, height)
-      .toFile(
-        `./build/images/${image.split('.')[0]}_${width}x${height}.jpg`,
-        (err): void => {
-          if (err) console.log(err);
+    // calling resize function that resize the image
+    const imageName = image;
+    const resizeImagePath = await resize(imageName, width, height);
 
-          // display the image
-          const img = fs.readFileSync(
-            `./build/images/${image}_${width}x${height}.jpg`
-          );
-          res.writeHead(200, { 'Content-Type': 'image/gif' });
-          res.end(img);
-        }
-      );
+    // display the image
+    const parentPath = path.resolve(resizeImagePath);
+    const img = fs.readFileSync(parentPath);
+    res.writeHead(200, { 'Content-Type': 'image/gif' });
+    res.end(img);
   }
 );
 
 // displaying the image
 router.get(
   '/img/?name=:name&width=:width&height=:height',
-  (req: Request, res: Response): void => {
+  (req: Request, res: Response): unknown => {
     interface Image {
       [image: string]: unknown;
     }
@@ -136,15 +140,14 @@ router.get(
     // if the name of the image does not exist send 404 Or same name but different sizes than that stored
     if (
       !fs.existsSync(
-        `./build/images/${image.name}_${image.width}x${image.height}.jpg`
+        `./resized/${image.name}_${image.width}x${image.height}.jpg`
       )
     ) {
-      const parentPath = path.resolve(__dirname, '..');
-      return res.status(404).sendFile(parentPath + '/public/image.html');
+      return res.status(404).send('Please enter the name of the stored image');
     }
 
     const img = fs.readFileSync(
-      `./build/images/${image.name}_${image.width}x${image.height}.jpg`
+      `./resized/${image.name}_${image.width}x${image.height}.jpg`
     );
     res.writeHead(200, { 'Content-Type': 'image/gif' });
     res.end(img);

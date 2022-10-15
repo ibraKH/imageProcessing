@@ -23,7 +23,11 @@ app.get('/', (req: Request, res: Response): void => {
 
 // Block unused pages
 app.get('*', (req: Request, res: Response): void => {
-  res.status(404).sendFile(__dirname + '/public/notFound.html');
+  res
+    .status(404)
+    .send(
+      'Page not found, resize from /resize/img/name=name&width=width&height=height'
+    );
 });
 
 app.listen(port, (): void => console.log(`Listening on port : ${port}`));

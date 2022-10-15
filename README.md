@@ -39,5 +39,3 @@ Scripts to run in the project :
 - npm run test
 - npm run build
 - npm run prettier
-
- 

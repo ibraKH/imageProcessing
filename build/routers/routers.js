@@ -13,17 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const resize_1 = __importDefault(require("../resize"));
 const router = express_1.default.Router();
 // get method to resize and filtter image , Request body shoud contain image file , width , height
 // Here if you want to store new image , if you have existed image try localhost:3004/resize/img/name=name&width=width&heigth=height
 router.post('/resize', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // send 404 when image file is empty
     if (!req.files) {
-        const parentPath = path_1.default.resolve(__dirname, '..');
-        return res.status(404).sendFile(parentPath + '/public/image.html');
+        return res.status(404).send('Please enter an image');
     }
     // expected eslint warning here since its any , cannot change it to unknown beacuse it will show error
     const { image } = req.files;
@@ -32,8 +31,7 @@ router.post('/resize', (req, res) => __awaiter(void 0, void 0, void 0, function*
     const height = parseInt(req.body.height);
     // send 404 when having negative numbers
     if (width < 0 || height < 0) {
-        const parentPath = path_1.default.resolve(__dirname, '..');
-        return res.status(404).sendFile(parentPath + '/public/image.html');
+        return res.status(404).send('Please enter a postive number');
     }
     let blur = false;
     let gray = false;
@@ -48,36 +46,36 @@ router.post('/resize', (req, res) => __awaiter(void 0, void 0, void 0, function*
         gray = true;
     }
     // create new file only if it does not exist already in the upload folder
-    if (!fs_1.default.existsSync(`./build/upload/${image.name}`)) {
-        yield image.mv('./build/upload/' + image.name);
+    if (!fs_1.default.existsSync(`./upload/${image.name}`)) {
+        yield image.mv('./upload/' + image.name);
     }
-    // using sharp to resize and filtering
-    yield (0, sharp_1.default)(`./build/upload/${image.name}`)
-        .resize(width, height)
-        .grayscale(gray)
-        .flip(flip)
-        .blur(blur ? 2 : 0.3)
-        .toFile(`./build/images/${image.name.split('.')[0]}_${width}x${height}.jpg`, (err) => {
-        if (err)
-            console.log(err);
-        // redirect to display the image
-        return res.redirect(`/img/name=${image.name.split('.')[0]}&width=${width}&height=${height}`);
-    });
+    // calling resize function that resize the image
+    const imageName = image.name.split('.')[0];
+    const resizeImagePath = yield (0, resize_1.default)(imageName, width, height, blur, gray, flip);
+    // display the image
+    const parentPath = path_1.default.resolve(resizeImagePath);
+    const img = fs_1.default.readFileSync(parentPath);
+    res.writeHead(200, { 'Content-Type': 'image/gif' });
+    res.end(img);
 }));
 // Resize without post method , with middleware to test if the file is exist
 router.get('/resize/img/?name=:name&width=:width&height=:height', (req, res, next) => {
     const image = req.params.name;
     let match = false;
     // test if image name is stored
-    fs_1.default.readdir('./build/upload/', (err, files) => {
+    fs_1.default.readdir('./upload/', (err, files) => {
+        const filesNames = [];
         files.forEach((file) => {
-            if (file.split(".")[0] == image) {
+            const fname = file.split('.')[0];
+            filesNames.push(fname);
+            if (file.split('.')[0] == image) {
                 match = true;
             }
         });
         if (!match) {
-            const parentPath = path_1.default.resolve(__dirname, '..');
-            return res.status(404).sendFile(parentPath + '/public/image.html');
+            return res
+                .status(404)
+                .send(`Please enter the name of the file correctly , if the file you looking for does not exist use these one that already stored ${filesNames}`);
         }
         else {
             next();
@@ -88,32 +86,32 @@ router.get('/resize/img/?name=:name&width=:width&height=:height', (req, res, nex
     // convert from string to number since the req.params gets as string
     const width = parseInt(req.params.width);
     const height = parseInt(req.params.height);
-    // send 404 when having negative numbers
-    if (width < 0 || height < 0) {
-        const parentPath = path_1.default.resolve(__dirname, '..');
-        return res.status(404).sendFile(parentPath + '/public/image.html');
+    // send 404 when having negative numbers or characters
+    if (width < 0 ||
+        height < 0 ||
+        req.params.width.match('[a-zA-Z]+') ||
+        req.params.height.match('[a-zA-Z]+')) {
+        return res
+            .status(404)
+            .send('Please enter only postive numbers in width , height');
     }
-    // using sharp to resize and filtering
-    yield (0, sharp_1.default)(`./build/upload/${image}.jpeg`)
-        .resize(width, height)
-        .toFile(`./build/images/${image.split('.')[0]}_${width}x${height}.jpg`, (err) => {
-        if (err)
-            console.log(err);
-        // display the image
-        const img = fs_1.default.readFileSync(`./build/images/${image}_${width}x${height}.jpg`);
-        res.writeHead(200, { 'Content-Type': 'image/gif' });
-        res.end(img);
-    });
+    // calling resize function that resize the image
+    const imageName = image;
+    const resizeImagePath = yield (0, resize_1.default)(imageName, width, height);
+    // display the image
+    const parentPath = path_1.default.resolve(resizeImagePath);
+    const img = fs_1.default.readFileSync(parentPath);
+    res.writeHead(200, { 'Content-Type': 'image/gif' });
+    res.end(img);
 }));
 // displaying the image
 router.get('/img/?name=:name&width=:width&height=:height', (req, res) => {
     const image = req.params;
     // if the name of the image does not exist send 404 Or same name but different sizes than that stored
-    if (!fs_1.default.existsSync(`./build/images/${image.name}_${image.width}x${image.height}.jpg`)) {
-        const parentPath = path_1.default.resolve(__dirname, '..');
-        return res.status(404).sendFile(parentPath + '/public/image.html');
+    if (!fs_1.default.existsSync(`./resized/${image.name}_${image.width}x${image.height}.jpg`)) {
+        return res.status(404).send('Please enter the name of the stored image');
     }
-    const img = fs_1.default.readFileSync(`./build/images/${image.name}_${image.width}x${image.height}.jpg`);
+    const img = fs_1.default.readFileSync(`./resized/${image.name}_${image.width}x${image.height}.jpg`);
     res.writeHead(200, { 'Content-Type': 'image/gif' });
     res.end(img);
 });

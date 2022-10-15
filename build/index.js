@@ -12,16 +12,16 @@ const app = (0, express_1.default)();
 app.use((0, express_fileupload_1.default)());
 // to use static file , image , html pages
 app.use(express_1.default.static('./build/public'));
-app.use("/", routers_1.default);
+app.use('/', routers_1.default);
 const port = 3004;
 // Home Page
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
     // rendering html page as main page
-    res.render("index.html");
+    res.render('index.html');
 });
 // Block unused pages
-app.get("*", (req, res) => {
-    res.status(404).sendFile(__dirname + "/public/notFound.html");
+app.get('*', (req, res) => {
+    res.status(404).sendFile(__dirname + '/public/notFound.html');
 });
 app.listen(port, () => console.log(`Listening on port : ${port}`));
 exports.default = app;

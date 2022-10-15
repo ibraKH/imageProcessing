@@ -1,57 +1,96 @@
-import supertest from "supertest";
-import fs from "fs";
-import app from "../index";
-
+import supertest from 'supertest';
+import fs from 'fs';
+import app from '../index';
 
 const request = supertest(app);
 
-describe('Post Resize page', () => {
-    it('gets a resized image', async () => {
-        const res = await request.post("/resize").set('content-type', 'multipart/form-data')
-        .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
-        .field('width', '400')
-        .field('height', "400")
+// Post method : not required
+describe('Get Resize page with post method', () => {
+  it('gets a resized image', async () => {
+    const res = await request
+      .post('/resize')
+      .set('content-type', 'multipart/form-data')
+      .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
+      .field('width', '400')
+      .field('height', '400');
 
-        // 302 since the api redirect to display the image
-        expect(res.statusCode).toEqual(302);
-    });
+    // 302 since the api redirect to display the image
+    expect(res.statusCode).toEqual(302);
+  });
+});
+
+describe('Resize page with get method', () => {
+  it('gets a resized image', async () => {
+    const res = await request.get('/resize/img/name=test&width=500&height=500');
+
+    // 302 since the api redirect to display the image
+    expect(res.statusCode).toEqual(200);
+  });
+});
+
+// Resize with file name thats never stored
+describe('Resize page with get method', () => {
+  it('gets errot status', async () => {
+    const res = await request.get(
+      '/resize/img/name=test&width=500&height=-500'
+    );
+
+    // 302 since the api redirect to display the image
+    expect(res.statusCode).toEqual(404);
+  });
+});
+
+// Resize with negative params
+describe('Get Resize page with get method', () => {
+  it('gets errot status', async () => {
+    const res = await request.get(
+      '/resize/img/name=test&width=500&height=-500'
+    );
+
+    // 302 since the api redirect to display the image
+    expect(res.statusCode).toEqual(404);
+  });
 });
 
 // Post Resize without image file
 describe('Testing for empty image', () => {
-    it('gets error status', async () => {
-        const res = await request.post("/resize").send({ width: '500', height: '500'});
+  it('gets error status', async () => {
+    const res = await request
+      .post('/resize')
+      .send({ width: '500', height: '500' });
 
-        expect(res.statusCode).toEqual(404);
-    });
+    expect(res.statusCode).toEqual(404);
+  });
 });
 
 // Post Resize with negative numbers
 describe('Testing for negative numbers', () => {
-    it('gets error status', async () => {
-        const res = await request.post("/resize").set('content-type', 'multipart/form-data')
-        .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
-        .field('width', '-400')
-        .field('height', "400")
+  it('gets error status', async () => {
+    const res = await request
+      .post('/resize')
+      .set('content-type', 'multipart/form-data')
+      .attach('image', fs.readFileSync(`./build/upload/test.jpeg`))
+      .field('width', '-400')
+      .field('height', '400');
 
-        expect(res.statusCode).toEqual(404);
-    });
+    expect(res.statusCode).toEqual(404);
+  });
 });
 
 // Get img with required params
 describe('Testing for displaying img', () => {
-    it('gets error status', async () => {
-        const res = await request.get("/img/name=test&width=500&height=700")
+  it('gets error status', async () => {
+    const res = await request.get('/img/name=test&width=500&height=500');
 
-        expect(res.statusCode).toEqual(200);
-    });
+    expect(res.statusCode).toEqual(200);
+  });
 });
 
 // Get img with new name : expect error
 describe('Testing for displaying img', () => {
-    it('gets error status', async () => {
-        const res = await request.get("/img/name=Riyadh&width=500&height=700")
+  it('gets error status', async () => {
+    const res = await request.get('/img/name=Riyadh&width=500&height=700');
 
-        expect(res.statusCode).toEqual(404);
-    });
+    expect(res.statusCode).toEqual(404);
+  });
 });

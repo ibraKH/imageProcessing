@@ -24,6 +24,11 @@ That's it
 
 ![project](build/upload/project.jpg)
 
+- localhost:3004/   : HomePage
+- localhost:3004/resize/img/name=name&width=width&heigth=height  : Resize stored image
+- localhost:3004/img/name=name&width=width&heigth=height   : Displaying stored img 
+
+
 image file & sizes ( Width , Height ) required,
 The filters are optional 
 

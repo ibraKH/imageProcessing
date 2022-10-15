@@ -16,44 +16,74 @@ const supertest_1 = __importDefault(require("supertest"));
 const fs_1 = __importDefault(require("fs"));
 const index_1 = __importDefault(require("../index"));
 const request = (0, supertest_1.default)(index_1.default);
-describe('Post Resize page', () => {
+// Post method : not required
+describe('Get Resize page with post method', () => {
     it('gets a resized image', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.post("/resize").set('content-type', 'multipart/form-data')
+        const res = yield request
+            .post('/resize')
+            .set('content-type', 'multipart/form-data')
             .attach('image', fs_1.default.readFileSync(`./build/upload/test.jpeg`))
             .field('width', '400')
-            .field('height', "400");
+            .field('height', '400');
         // 302 since the api redirect to display the image
         expect(res.statusCode).toEqual(302);
+    }));
+});
+describe('Resize page with get method', () => {
+    it('gets a resized image', () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield request.get('/resize/img/name=test&width=500&height=500');
+        // 302 since the api redirect to display the image
+        expect(res.statusCode).toEqual(200);
+    }));
+});
+// Resize with file name thats never stored 
+describe('Resize page with get method', () => {
+    it('gets errot status', () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield request.get('/resize/img/name=test&width=500&height=-500');
+        // 302 since the api redirect to display the image
+        expect(res.statusCode).toEqual(404);
+    }));
+});
+// Resize with negative params
+describe('Get Resize page with get method', () => {
+    it('gets errot status', () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield request.get('/resize/img/name=test&width=500&height=-500');
+        // 302 since the api redirect to display the image
+        expect(res.statusCode).toEqual(404);
     }));
 });
 // Post Resize without image file
 describe('Testing for empty image', () => {
     it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.post("/resize").send({ width: '500', height: '500' });
+        const res = yield request
+            .post('/resize')
+            .send({ width: '500', height: '500' });
         expect(res.statusCode).toEqual(404);
     }));
 });
 // Post Resize with negative numbers
 describe('Testing for negative numbers', () => {
     it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.post("/resize").set('content-type', 'multipart/form-data')
+        const res = yield request
+            .post('/resize')
+            .set('content-type', 'multipart/form-data')
             .attach('image', fs_1.default.readFileSync(`./build/upload/test.jpeg`))
             .field('width', '-400')
-            .field('height', "400");
+            .field('height', '400');
         expect(res.statusCode).toEqual(404);
     }));
 });
 // Get img with required params
 describe('Testing for displaying img', () => {
     it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.get("/img/name=test&width=500&height=700");
+        const res = yield request.get('/img/name=test&width=500&height=500');
         expect(res.statusCode).toEqual(200);
     }));
 });
 // Get img with new name : expect error
 describe('Testing for displaying img', () => {
     it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.get("/img/name=Riyadh&width=500&height=700");
+        const res = yield request.get('/img/name=Riyadh&width=500&height=700');
         expect(res.statusCode).toEqual(404);
     }));
 });

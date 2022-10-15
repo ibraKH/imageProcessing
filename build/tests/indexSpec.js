@@ -17,14 +17,14 @@ const index_1 = __importDefault(require("../index"));
 const request = (0, supertest_1.default)(index_1.default);
 describe('Test Home page response', () => {
     it('gets Home page', () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.get("/");
+        const res = yield request.get('/');
         expect(res.statusCode).toEqual(200);
     }));
 });
 describe('Test for unfound page response', () => {
     it('gets error status', () => __awaiter(void 0, void 0, void 0, function* () {
         // entering random page
-        const res = yield request.get("/re");
+        const res = yield request.get('/re');
         expect(res.statusCode).toEqual(404);
     }));
 });

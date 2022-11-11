@@ -13,7 +13,7 @@ router.get(
     const image: string = req.params.name;
 
     let match = false;
-
+    
     // test if image name is stored
     fs.readdir('./upload/', (err, files): unknown => {
       const filesNames: string[] = [];

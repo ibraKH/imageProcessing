@@ -22,7 +22,7 @@ To start the project and try the project , write in git bash :
 
 That's it 
 
-![project](build/upload/project.jpg)
+
 
 - localhost:3004/   : HomePage
 - localhost:3004/resize/img/name=name&width=width&heigth=height  : Resize stored image
